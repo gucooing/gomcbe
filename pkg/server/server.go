@@ -1,7 +1,6 @@
 package server
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/gucooing/gomcbe/pkg/config"
 	"io"
@@ -12,7 +11,6 @@ import (
 )
 
 func Server() {
-	reader := bufio.NewReader(os.Stdin)
 	var stdin io.WriteCloser
 	var cmd *exec.Cmd
 	var stdout io.ReadCloser
@@ -41,18 +39,26 @@ func Server() {
 		}
 	}()
 
+	cmd1 := make(chan string)
+
+	go Cmdenter(cmd1)
 	for {
-		fmt.Print(">> ")
-		input, _ := reader.ReadString('\n')
-		input = strings.TrimSpace(input)
-		if input == "stop" {
-			break
-		} else {
-			_, err := io.WriteString(stdin, input+"\n")
-			if err != nil {
-				fmt.Println("无法发送命令原因:", err)
+		select {
+		case input := <-cmd1:
+			fmt.Print(">> ")
+			fmt.Print(input)
+			input = strings.TrimSpace(input)
+			if input == "stop" {
 				break
+			} else {
+				_, err := io.WriteString(stdin, input+"\n")
+				if err != nil {
+					fmt.Println("无法发送命令原因:", err)
+					break
+				}
 			}
+		default:
+			//fmt.Println("无输入:")
 		}
 	}
 	err = stdin.Close()
