@@ -31,16 +31,15 @@ func main() {
 		//启动服务器
 		for {
 			programPath := config.GetConfig().ServerPath
-			args := []string{config.GetConfig().Args}
 
-			cmd, stdin, err := server.Server(programPath, args)
+			cmd, stdin, err := server.Server(programPath)
 			if err != nil {
 				fmt.Printf("服务器启动失败: %v\n", err)
 				return
 			}
 			defer stdin.Close()
 			go server.Cmdenter(stdin)
-			fmt.Println("\nMC 启动！")
+			fmt.Println("\nServer 启动！")
 			err = cmd.Wait()
 			break
 		}

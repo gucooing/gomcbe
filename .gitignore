@@ -15,6 +15,8 @@ out/
 atlassian-ide-plugin.xml
 logs
 *.log
+linux-amd64
+linux-arm64
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
