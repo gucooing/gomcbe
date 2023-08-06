@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	ServerPath string `json:"ServerPath"`
+	Args       string `json:"args"`
 }
 
 var CONF *Config = nil
@@ -41,4 +42,5 @@ func LoadConfig() error {
 
 var DefaultConfig = &Config{
 	ServerPath: "D:/XM/bds/bedrock_server.exe",
+	Args:       "",
 }
