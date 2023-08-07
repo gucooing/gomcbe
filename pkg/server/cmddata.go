@@ -2,47 +2,54 @@ package server
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os"
 )
 
+var Commandment = make(chan string)
+
 // Command 监听控制台输入，并将结果传入服务器
-func Command(stdin io.WriteCloser) {
-	defer func(stdin io.WriteCloser) {
-		err := stdin.Close()
-		if err != nil {
-
-		}
-	}(stdin)
+func Command(stdin io.WriteCloser, ctx context.Context) {
 	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		command := scanner.Text()
-		SendCommand(stdin, command)
-	}
-}
-
-// Commands 接收第三方命令，传入服务器
-func Commands(stdin io.WriteCloser) {
-	defer func(stdin io.WriteCloser) {
-		err := stdin.Close()
-		if err != nil {
-
+	commandChan := make(chan string)
+	// 开启一个goroutine监听控制台输入
+	go func() {
+		for scanner.Scan() {
+			command := scanner.Text()
+			commandChan <- command
 		}
-	}(stdin)
-	commandment := make(chan string)
+	}()
 	for {
 		select {
-		case command := <-commandment:
+		case <-ctx.Done():
+			fmt.Println("收到停止信号，关闭Command")
+			return
+		case command := <-commandChan:
 			SendCommand(stdin, command)
 		}
 	}
 }
 
+// Commands 接收第三方命令，传入服务器
+func Commands(stdin io.WriteCloser, ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("收到停止信号，关闭Commands")
+			return
+		case command := <-Commandment:
+			fmt.Printf("QQ管理员命令: %v\n", command)
+			SendCommand(stdin, command)
+		}
+
+	}
+}
+
 // Sender 第三方命令传入通道
 func Sender(msg string) {
-	commandment := make(chan string)
-	commandment <- msg
+	Commandment <- msg
 }
 
 // SendCommand 发送命令到服务器

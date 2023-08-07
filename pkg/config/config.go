@@ -7,7 +7,9 @@ import (
 )
 
 type Config struct {
-	ServerPath string `json:"ServerPath"`
+	ServerPath  string `json:"ServerPath"`
+	CqhttpWsurl string `json:"CqhttpWsurl"`
+	QqAdmin     int    `json:"Qqadmin"`
 }
 
 var CONF *Config = nil
@@ -40,5 +42,7 @@ func LoadConfig() error {
 }
 
 var DefaultConfig = &Config{
-	ServerPath: "D:/XM/bds/bedrock_server.exe",
+	ServerPath:  "D:/XM/bds/bedrock_server.exe",
+	CqhttpWsurl: "ws://127.0.0.1:8080",
+	QqAdmin:     123456789,
 }
