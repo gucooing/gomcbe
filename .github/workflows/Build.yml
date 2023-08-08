@@ -1,25 +1,48 @@
 name: Build
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/*.yml"
   pull_request:
-    branches:
-      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/*.yml"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
+      GOARM: ${{ matrix.goarm }}
+      CGO_ENABLED: 0
     
     steps:
+    - name: Checkout codebase
+      uses: actions/checkout@v3
+
+    - name: Show workflow information
+      run: |
+        echo "GOOS: $GOOS, GOARCH: $GOARCH, GOARM: $GOARM, GOMIPS: $GOMIPS, RELEASE_NAME: $_NAME"
+        echo "ASSET_NAME=$_NAME" >> $GITHUB_ENV
+
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: 1.20
-        
-    - name: Check out code
-      uses: actions/checkout@v3
+        go-version: "1.20"
+        check-latest: true
+
+    - name: Get project dependencies
+      run: go mod download
     
     - name: Build for Linux (x64)
       run: go build -o gomcbe-linux-x64 cmd/gomcbe/main.go
@@ -45,10 +68,16 @@ jobs:
         GOOS: windows
         GOARCH: 386
     
-    - name: Build for ARM
+    - name: Build for  Linux (ARM)
       run: go build -o gomcbe-linux-arm cmd/gomcbe/main.go
       env:
         GOOS: linux
+        GOARCH: arm
+
+    - name: Build for Windows (ARM)
+      run: go build -o gomcbe-linux-arm cmd/gomcbe/main.go
+      env:
+        GOOS: windows
         GOARCH: arm
     
     - name: Archive artifacts
@@ -61,3 +90,4 @@ jobs:
           gomcbe-windows-x64.exe
           gomcbe-windows-x86.exe
           gomcbe-linux-arm
+          gomcbe-windows-arm.exe
