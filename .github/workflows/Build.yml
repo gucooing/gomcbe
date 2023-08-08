@@ -80,14 +80,21 @@ jobs:
         GOOS: windows
         GOARCH: arm
     
-    - name: Archive artifacts
-      uses: actions/upload-artifact@v2
+    - name: Archive Linux artifacts
+      uses: actions/upload-artifact@v3
       with:
-        name: gomcbe-binaries
+        name: gomcbe-linux.zip
         path: |
           gomcbe-linux-x64
           gomcbe-linux-x86
+          gomcbe-linux-arm
+        if-no-files-found: warn
+    - name: Archive Windows artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: gomcbe-windows.zip
+        path: |
           gomcbe-windows-x64.exe
           gomcbe-windows-x86.exe
-          gomcbe-linux-arm
           gomcbe-windows-arm.exe
+        if-no-files-found: warn
