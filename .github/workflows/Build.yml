@@ -75,7 +75,7 @@ jobs:
         GOARCH: arm
 
     - name: Build for Windows (ARM)
-      run: go build -o gomcbe-linux-arm cmd/gomcbe/main.go
+      run: go build -o gomcbe-windows-arm.exe cmd/gomcbe/main.go
       env:
         GOOS: windows
         GOARCH: arm
