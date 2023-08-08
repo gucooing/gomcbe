@@ -24,7 +24,6 @@ func Reqws(ctx context.Context) {
 		if err := conn.Close(); err != nil {
 		}
 	}()
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -41,6 +40,7 @@ func Reqws(ctx context.Context) {
 	}
 }
 
+// Reqdata 定义接收结构体
 type Reqdata struct {
 	MessageType string  `json:"message_type"`
 	Sender      *Sender `json:"sender"`
@@ -82,6 +82,7 @@ func SendWSMessage(msg interface{}) error {
 	return nil
 }
 
+// Params 定义发送结构体
 type Params struct {
 	MessageType string `json:"message_type"`
 	UserId      int    `json:"user_id"`
